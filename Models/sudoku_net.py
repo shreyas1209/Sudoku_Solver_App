@@ -24,14 +24,21 @@ class sudokunet(nn.Module):
 
   def forward(self,x):
     x = self.conv1(x)
+    x = F.relu(x)
     x = self.pool1(x)
     x = self.conv2(x)
+    x = F.relu(x)
     x = self.pool2(x)
     x = self.conv3(x)
+    x = F.relu(x)
     x = x.reshape(x.shape[0],-1)
     x = self.output(x)
     
     return x
+
+
+
+
 
 
 
