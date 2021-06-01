@@ -22,6 +22,8 @@ import imutils
 import numpy as np
 from imutils.perspective import four_point_transform
 from google.colab.patches import cv2_imshow
+
+
 def sudoku_detector(img,show = False):
   image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
   
