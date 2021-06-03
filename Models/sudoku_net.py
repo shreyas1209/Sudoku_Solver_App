@@ -35,9 +35,17 @@ class sudokunet(nn.Module):
     x = self.output(x)
     
     return x
+  
+def predict(model,x):
+  device = torch.device("cuda")
+  model.eval()
+  model = model.to(device = device)
+  with torch.no_grad():
+    x.to(device)
+    scores = model(x)
+    prediction = scores.argmax(1)
 
-
-
+  return prediction
 
 
 
