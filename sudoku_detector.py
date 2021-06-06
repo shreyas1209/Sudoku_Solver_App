@@ -55,9 +55,15 @@ def find_boundary(img,show = True):
   top_left , _ = min(enumerate([tl[0][0] + tl[0][1] for tl in sudoku_box]), key= operator.itemgetter(1))
   top_right , _ = max(enumerate([tr[0][0] - tr[0][1] for tr in sudoku_box]), key= operator.itemgetter(1))
   bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in sudoku_box]), key= operator.itemgetter(1))
-  bottom_right , _ = max(enumerate([br[0][0] - br[0][1] for br in sudoku_box]), key= operator.itemgetter(1))
+  bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in sudoku_box]), key= operator.itemgetter(1))
   
-  return(sudoku_box[top_left][0],sudoku_box[top_right][0],sudoku_box[bottom_left][0],sudoku_box[bottom_right][0])
+  return([sudoku_box[top_left][0],sudoku_box[top_right][0],sudoku_box[bottom_left][0],sudoku_box[bottom_right][0]])
+
+def draw_boundary(img,corners,show = True):
+  pts = np.array([corners], np.int32)
+  pts = pts.reshape((-1,1,2))
+  drawn = cv2.polylines(img,[pts],True,(0,0,255))
+  cv2_imshow(drawn)
 
 
 
@@ -85,6 +91,7 @@ def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = F
         
       
 
+  
   
 
         
