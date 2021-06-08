@@ -23,11 +23,11 @@ def sudoku_detector(img,show = False, dilate = True):
   image_blur = cv2.GaussianBlur(image_gray,(5,5),3)
   
   image_threshold = cv2.adaptiveThreshold(image_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
-  
-  kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8)
+
   
   image_processed = image_threshold
   if dilate == True:
+    kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8)
     image_processed = cv2.dilate(image_threshold, kernel)
 
   
@@ -36,35 +36,64 @@ def sudoku_detector(img,show = False, dilate = True):
         cv2_imshow(image_gray)
         cv2_imshow(image_blur)
         cv2_imshow(image_threshold)
+        
         cv2_imshow(image_processed)
           
   return(image_processed)
 
-def find_boundary(img,show = True):
-  contours,hierarchy = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-  contours = sorted(contours, key=cv2.contourArea, reverse=True)
-  sudoku_box = contours[0]
+def find_boundary(original_img,img,show = True):
+  contours = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+  contours = imutils.grab_contours(contours)
+  original_pic = original_img.copy()
+  from google.colab.patches import cv2_imshow
+  for i,contour in enumerate(contours):
+    approx_box = cv2.approxPolyDP(contour, 0.01*cv2.arcLength(contour,True),True)
+    if len(approx_box)==4:
+      X,Y,W,H = cv2.boundingRect(approx_box)
+      
+      if (H>3 and W>3):
+        cv2.drawContours(original_pic, [approx_box], 0, (0,0,255),5)
+        
+        cv2_imshow(original_pic)
+        cv2_imshow(img)
+        top_left , _ = min(enumerate([tl[0][0] + tl[0][1] for tl in approx_box]), key= operator.itemgetter(1))
+        top_right , _ = max(enumerate([tr[0][0] - tr[0][1] for tr in approx_box]), key= operator.itemgetter(1))
+        bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in approx_box]), key= operator.itemgetter(1))
+        bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in approx_box]), key= operator.itemgetter(1))
   
- 
-	# Top-left has point smallest (x + y) value
-	# Top-right point has largest (x - y) value
-  # Bottom-left point has smallest (x - y) value
-  # Bottom-right point has largest (x + y) value
+        return([approx_box[top_left][0],approx_box[top_right][0],approx_box[bottom_left][0],approx_box[bottom_right][0]])
+        
+
+
+def euclidean_distance(pt1, pt2): 
+    x = pt2[0] - pt1[0] 
+    y = pt2[1] - pt1[1] 
+    return np.sqrt((x ** 2) + (y ** 2))
+    
+def crop_and_warp(img,box_array):
+  top_left,top_right,bottom_left,bottom_right = box_array
+   
+  #breadth and length of new image
+	#Maximum distance between bottom-right and bottom-left x-coordinates or the top-right and top-left x-coordinates
+  breadth_1 = euclidean_distance(bottom_left,bottom_right)
+  breadth_2 = euclidean_distance(bottom_left,bottom_right)
+  max_breadth = max(int(breadth_1),int(breadth_2))
+  #Maximum distance between the top-right and bottom-right y-coordinates or the top-left and bottom-left y-coordinates
 	
-  #idea taken from aakash jhawar's blog
-  top_left , _ = min(enumerate([tl[0][0] + tl[0][1] for tl in sudoku_box]), key= operator.itemgetter(1))
-  top_right , _ = max(enumerate([tr[0][0] - tr[0][1] for tr in sudoku_box]), key= operator.itemgetter(1))
-  bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in sudoku_box]), key= operator.itemgetter(1))
-  bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in sudoku_box]), key= operator.itemgetter(1))
+  length_1 = euclidean_distance(top_right,bottom_right)
+  length_2 = euclidean_distance(top_left,bottom_left)
+  max_length = max(int(length_1),int(length_2))
+  #construct the set of destination points to obtain a "top-down view",  of the image, again specifying points 
+  #in the top-left, top-right, bottom-right, and bottom-left order
+  destination_pts = np.array([[0,0],[max_breadth-1,0],[max_breadth-1,max_length-1],[0,max_length-1]],dtype = "float32")
+  # compute the perspective transform matrix and then apply it
+  image_perspective = cv2.getPerspectiveTransform(box_array,destination_pts)
+  image_warped = cv2.warpPerspective(img,image_perspective,(max_breadth,max_length))
+  cv2_imshow(image_warped)
+  return image_warped
+	
   
-  return([sudoku_box[top_left][0],sudoku_box[top_right][0],sudoku_box[bottom_left][0],sudoku_box[bottom_right][0]])
-
-def draw_boundary(img,corners,show = True):
-  pts = np.array([corners], np.int32)
-  pts = pts.reshape((-1,1,2))
-  drawn = cv2.polylines(img,[pts],True,(0,0,255))
-  cv2_imshow(drawn)
-
 
 
 from skimage.segmentation import clear_border
@@ -87,14 +116,4 @@ def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = F
     cv2_imshow(digit_threshold)
 
   return(digit_threshold)
-
-        
-      
-
-  
-  
-
-        
-      
-
   
