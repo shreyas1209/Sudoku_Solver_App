@@ -92,8 +92,10 @@ def crop_and_warp(original_img,img,box_array):
   # compute the perspective transform matrix and then apply it
   image_perspective = cv2.getPerspectiveTransform(box_array,destination_pts)
   image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side),int(max_side)))
+  img_warped = cv2.warpPerspective(img,image_perspective,(int(max_side),int(max_side)))
   cv2_imshow(image_warped)
-  return image_warped
+  cv2_imshow(img_warped)
+  return (image_warped,img_warped)
 	
   
 
