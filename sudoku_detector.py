@@ -54,15 +54,15 @@ def find_boundary(original_img,img,show = True):
       
       if (H>3 and W>3):
         cv2.drawContours(original_pic, [approx_box], 0, (0,0,255),5)
-        
-        cv2_imshow(original_pic)
-        cv2_imshow(img)
+      
         top_left , _ = min(enumerate([tl[0][0] + tl[0][1] for tl in approx_box]), key= operator.itemgetter(1))
         top_right , _ = max(enumerate([tr[0][0] - tr[0][1] for tr in approx_box]), key= operator.itemgetter(1))
         bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in approx_box]), key= operator.itemgetter(1))
         bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in approx_box]), key= operator.itemgetter(1))
+        
+        cv2_imshow(original_pic)
   
-        return([approx_box[top_left][0],approx_box[top_right][0],approx_box[bottom_left][0],approx_box[bottom_right][0]])
+        return(np.array([approx_box[top_left][0],approx_box[top_right][0],approx_box[bottom_right][0],approx_box[bottom_left][0]],np.float32))
         
 
 
@@ -71,25 +71,27 @@ def euclidean_distance(pt1, pt2):
     y = pt2[1] - pt1[1] 
     return np.sqrt((x ** 2) + (y ** 2))
     
-def crop_and_warp(img,box_array):
-  top_left,top_right,bottom_left,bottom_right = box_array
-   
-  #breadth and length of new image
-	#Maximum distance between bottom-right and bottom-left x-coordinates or the top-right and top-left x-coordinates
+def crop_and_warp(original_img,img,box_array):
+  top_left,top_right,bottom_right,bottom_left = box_array
+  original_pic = original_img.copy()
+  original_pic= cv2.circle(original_pic, (top_left[0],top_left[1]), radius=10, color=(255, 0, 0), thickness=-10)
+  original_pic = cv2.circle(original_pic, (top_right[0],top_right[1]), radius=10, color=(255, 0, 0), thickness=-10)
+  original_pic = cv2.circle(original_pic, (bottom_left[0],bottom_left[1]), radius=10, color=(255, 0, 0), thickness=-10)
+  original_pic = cv2.circle(original_pic, (bottom_right[0],bottom_right[1]), radius=10, color=(255, 0, 0), thickness=-10)
+  cv2_imshow(original_pic)
+  
+  #Maximum length
   breadth_1 = euclidean_distance(bottom_left,bottom_right)
   breadth_2 = euclidean_distance(bottom_left,bottom_right)
-  max_breadth = max(int(breadth_1),int(breadth_2))
-  #Maximum distance between the top-right and bottom-right y-coordinates or the top-left and bottom-left y-coordinates
-	
   length_1 = euclidean_distance(top_right,bottom_right)
   length_2 = euclidean_distance(top_left,bottom_left)
-  max_length = max(int(length_1),int(length_2))
+  max_side = max(breadth_1,breadth_2,length_1,length_2)
   #construct the set of destination points to obtain a "top-down view",  of the image, again specifying points 
   #in the top-left, top-right, bottom-right, and bottom-left order
-  destination_pts = np.array([[0,0],[max_breadth-1,0],[max_breadth-1,max_length-1],[0,max_length-1]],dtype = "float32")
+  destination_pts = np.array([[0,0],[max_side-1,0],[max_side-1,max_side-1],[0,max_side-1]],np.float32)
   # compute the perspective transform matrix and then apply it
   image_perspective = cv2.getPerspectiveTransform(box_array,destination_pts)
-  image_warped = cv2.warpPerspective(img,image_perspective,(max_breadth,max_length))
+  image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side),int(max_side)))
   cv2_imshow(image_warped)
   return image_warped
 	
@@ -116,4 +118,8 @@ def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = F
     cv2_imshow(digit_threshold)
 
   return(digit_threshold)
+
+        
+      
+
   
