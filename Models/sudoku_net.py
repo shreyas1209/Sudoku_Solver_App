@@ -13,7 +13,7 @@ import time
 
 class sudokunet1(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
-    super(sudokunet,self).__init__()
+    super(sudokunet1,self).__init__()
     self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
     self.pool1 = nn.MaxPool2d(2)#12x12
     self.conv2 = nn.Conv2d(32,32,kernel_size = 3, stride = 1,padding = 1) #10x10
@@ -46,15 +46,15 @@ class sudokunet1(nn.Module):
 #Output width = (Output width + padding width right + padding width left - kernel width) / (stride width) + 1
 class sudokunet2(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
-    super(sudokunet,self).__init__()
+    super(sudokunet2,self).__init__()
     self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
     self.pool1 = nn.MaxPool2d(2)#12x12
     self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #10x10
     self.pool2 = nn.MaxPool2d(2) #5x5
     self.fc1 = nn.Linear(2304,128)
-    self.dropout1 = nn.Dropout(p=0.2sss5)
+    self.dropout1 = nn.Dropout(p=0.5)
     self.fc2 = nn.Linear(128,64)
-    self.dropout2 = nn.Dropout(p=0.25)
+    self.dropout2 = nn.Dropout(p=0.5)
     self.output = nn.Linear(64, output_classes)
 
   def forward(self,x):
@@ -80,13 +80,14 @@ class sudokunet2(nn.Module):
 #Output width = (Output width + padding width right + padding width left - kernel width) / (stride width) + 1
 class sudokunet3(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
-    super(sudokunet,self).__init__()
-    self.conv1 = nn.Conv2d(1,32,kernel_size = 3,stride = 1,padding = 1) #28x28
-    self.pool1 = nn.MaxPool2d(2)#14x14
-    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #14x14
-    self.pool2 = nn.MaxPool2d(2) #7x7
-    self.fc1 = nn.Linear(3136,128)
-    self.fc2 = nn.Linear(128,64)
+    super(sudokunet3,self).__init__()
+    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
+    self.pool1 = nn.MaxPool2d(2)#12x12
+    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #12x12
+    self.pool2 = nn.MaxPool2d(2) #6x6
+    self.fc1 = nn.Linear(2304,64)
+    self.dropout1 = nn.Dropout(p=0.25)
+    self.fc2 = nn.Linear(64,64)
     self.output = nn.Linear(64, output_classes)
 
   def forward(self,x):
@@ -99,6 +100,7 @@ class sudokunet3(nn.Module):
     x = x.reshape(x.shape[0],-1)
     x = self.fc1(x)
     x = F.relu(x)
+    x = self.dropout1(x)
     x = self.fc2(x)
     x = F.relu(x)
     x = self.output(x)
@@ -116,4 +118,3 @@ def predict(model,x):
     prediction = scores.argmax(1)
 
   return prediction
-
