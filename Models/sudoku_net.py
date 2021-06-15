@@ -19,7 +19,7 @@ class sudokunet1(nn.Module):
     self.conv2 = nn.Conv2d(32,32,kernel_size = 3, stride = 1,padding = 1) #10x10
     self.pool2 = nn.MaxPool2d(2) #5x5
     self.fc1 = nn.Linear(1152,128)
-    self.dropout1 = nn.Dropout(p=0.5)
+    self.dropout1 = nn.Dropout(p=0.2)
     self.fc2 = nn.Linear(128,64)
     self.output = nn.Linear(64, output_classes)
 
@@ -54,7 +54,7 @@ class sudokunet2(nn.Module):
     self.fc1 = nn.Linear(2304,128)
     self.dropout1 = nn.Dropout(p=0.2)
     self.fc2 = nn.Linear(128,64)
-    self.dropout2 = nn.Dropout(p=0.5)
+    self.dropout2 = nn.Dropout(p=0.4) #0.5
     self.output = nn.Linear(64, output_classes)
 
   def forward(self,x):
@@ -85,10 +85,11 @@ class sudokunet3(nn.Module):
     self.pool1 = nn.MaxPool2d(2)#12x12
     self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #12x12
     self.pool2 = nn.MaxPool2d(2) #6x6
-    self.fc1 = nn.Linear(2304,64)
+    self.fc1 = nn.Linear(2304,256)
     self.dropout1 = nn.Dropout(p=0.25)
-    self.fc2 = nn.Linear(64,64)
-    self.output = nn.Linear(64, output_classes)
+    self.fc2 = nn.Linear(256,128)
+    self.dropout2 = nn.Dropout(p=0.5)
+    self.output = nn.Linear(128, output_classes)
 
   def forward(self,x):
     x = self.conv1(x)
@@ -103,6 +104,7 @@ class sudokunet3(nn.Module):
     x = self.dropout1(x)
     x = self.fc2(x)
     x = F.relu(x)
+    x = self.dropout2(x)
     x = self.output(x)
     x = F.softmax(x)
     
