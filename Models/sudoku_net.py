@@ -52,7 +52,7 @@ class sudokunet2(nn.Module):
     self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #10x10
     self.pool2 = nn.MaxPool2d(2) #5x5
     self.fc1 = nn.Linear(2304,128)
-    self.dropout1 = nn.Dropout(p=0.5)
+    self.dropout1 = nn.Dropout(p=0.2)
     self.fc2 = nn.Linear(128,64)
     self.dropout2 = nn.Dropout(p=0.5)
     self.output = nn.Linear(64, output_classes)
