@@ -18,24 +18,30 @@ import operator
 
 
 def sudoku_detector(img,show = True, dilate = False ,erode = False):
-  image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#converts colorspace from RGB to graysacle
   
-  image_blur = cv2.GaussianBlur(image_gray,(7,7),3)
+  image_blur = cv2.GaussianBlur(image_gray,(7,7),3) #adding a gaussian blur with kernel size 7 and stddev 3 to reduce noise in the image
   
+  #adaptive threshold method where the threshold value is calculated for smaller regions 
+  #max pixel  value to be given after thresholding is 255 ( white color)
+  #ADAPTIVE_THRESH_GAUSSIAN_C − threshold value is the weighted sum of neighborhood values where weights are a Gaussian window.
+  #cv2.THRESH_BINARY_INV - Inverts the case of binary thresholding
+  #threshold uses 11 neighboring pixels
   image_threshold = cv2.adaptiveThreshold(image_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
 
   
   image_processed = image_threshold
+  #adding an option dilation and erosion 
+  
   if dilate == True:
-    kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8)
+    kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8) #kernel finds the maximum overlap in dilation and minimum overlap in erosion
     image_processed = cv2.dilate(image_threshold, kernel)
   if erode == True:
     kernel = np.ones((5,5),np.uint8)
     image_processed = cv2.erode(image_processed,kernel,iterations = 1)
 		
-
-  
   original_pic = img.copy()
+  #displaying the preprocces_images
   if show == True:
         cv2_imshow(image_gray)
         cv2_imshow(image_blur)
@@ -43,6 +49,7 @@ def sudoku_detector(img,show = True, dilate = False ,erode = False):
         cv2_imshow(image_processed)
           
   return(image_processed)
+#end of sudokupreprocessing
 
 def find_boundary(original_img,img,show = True):
   contours = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -110,7 +117,7 @@ def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = T
   image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-  #image_blur = cv2.GaussianBlur(img,(1,1),3)
+  #image_blur = cv2.GaussianBlur(image_gray,(3,3),3)
   #kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8)
   #image_processed = cv2.dilate(img, kernel)
   image_processed = image_gray
