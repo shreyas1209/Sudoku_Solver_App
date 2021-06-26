@@ -16,7 +16,17 @@ from imutils.perspective import four_point_transform
 from google.colab.patches import cv2_imshow
 import operator
 
+'''
+sudoku_detector(img,show = True, dilate  = False , erode = False):Applies basic image preprocessing on an image
+like converting to grayscale, blurring the image using gaussian blur, and adaptive thresholding.
+The parameters are - 
+img: The image to which the preprocessing is done
+show : Default is True.It shows each step of the preprocessing
+dilate: Default is False. It applies dilation onto the image
+erode: Default is False. It applies erosion onto the image
 
+This function returns the processed image
+'''
 def sudoku_detector(img,show = True, dilate = False ,erode = False):
   image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)#converts colorspace from RGB to graysacle
   
@@ -51,46 +61,71 @@ def sudoku_detector(img,show = True, dilate = False ,erode = False):
   return(image_processed)
 #end of sudokupreprocessing
 
-def find_boundary(original_img,img,show = True):
-  contours = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+'''
+find_boundary(original_img,img,show = True): Finds the boundary for the bounding box in the given image
+Parameters-
+original_img: The non preprocessed image
+img : The preprocessed image
+show: Default is True. Shows the bounding box
+returns tuple for coordinates in the form (top_left,top_right, bottom_right,bottom_left)
+'''
 
-  contours = imutils.grab_contours(contours)
+def find_boundary(original_img,img,show = True):
+  contours = cv2.findContours(img.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)#finding the contours
+
+  contours = imutils.grab_contours(contours)#adds a counter to the contour
   original_pic = original_img.copy()
   from google.colab.patches import cv2_imshow
-  for i,contour in enumerate(contours):
-    approx_box = cv2.approxPolyDP(contour, 0.01*cv2.arcLength(contour,True),True)
-    if len(approx_box)==4:
-      X,Y,W,H = cv2.boundingRect(approx_box)
+  for i,contour in enumerate(contours):  #iterating for all the detected contours
+    approx_box = cv2.approxPolyDP(contour, 0.01*cv2.arcLength(contour,True),True) #approximates a contour shape to another shape with less number of vertices with 0.01 precision 
+    if len(approx_box)==4:#finding if the box is quadrilateral in shape
+      X,Y,W,H = cv2.boundingRect(approx_box)   #x,y coordinates of top left corner and w,h are width and height of the box 
       
-      if (H>3 and W>3):
-        cv2.drawContours(original_pic, [approx_box], 0, (0,0,255),5)
-      
+      if (H>3 and W>3):      #avoiding smaller contours
+        cv2.drawContours(original_pic, [approx_box], 0, (0,0,255),5)  #plotting the edge of the box
+        #operation.itemgetter allows us to get max and min values of the index of the point
+        #Each point is an array of X and Y coordinates so [0] represents X coordinate and [1] represents Y coordinate
+        #top left has smallest x+y value
+        #top right has the maximum x-y value
+        #bottom left has the smallest x-y value
+        #bottom right has the largest x+y value
+        #Now using this to get the coordinates of the 4 corners of the box
         top_left , _ = min(enumerate([tl[0][0] + tl[0][1] for tl in approx_box]), key= operator.itemgetter(1))
         top_right , _ = max(enumerate([tr[0][0] - tr[0][1] for tr in approx_box]), key= operator.itemgetter(1))
         bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in approx_box]), key= operator.itemgetter(1))
         bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in approx_box]), key= operator.itemgetter(1))
         if show ==True:
           cv2_imshow(original_pic)
-  
+        #returns coordinates
         return(np.array([approx_box[top_left][0],approx_box[top_right][0],approx_box[bottom_right][0],approx_box[bottom_left][0]],np.float32))
         
 
 
-def euclidean_distance(pt1, pt2): 
+def euclidean_distance(pt1, pt2): #finds euclidean distance
     x = pt2[0] - pt1[0] 
     y = pt2[1] - pt1[1] 
     return np.sqrt((x ** 2) + (y ** 2))
-    
+'''
+crop_and_warp(original_img,img,box_array,show = True): Function that crops the sudoku's bounding box from the rest 
+of the image and gives us a top-down view
+Parameters-
+original_img: The non preprocessed image
+img : The preprocessed image
+box_array:The coordinates of bounding box in the form(top_left,top_right, bottom_right,bottom_left)
+show: Default is True. Shows the cropped and warped image
+returns (original image warped , preprocessed image warped)
+'''
 def crop_and_warp(original_img,img,box_array,show = True):
   top_left,top_right,bottom_right,bottom_left = box_array
   original_pic = original_img.copy()
+  #Plotting the corner points of the bounding box
   original_pic= cv2.circle(original_pic, (top_left[0],top_left[1]), radius=10, color=(255, 0, 0), thickness=-10)
   original_pic = cv2.circle(original_pic, (top_right[0],top_right[1]), radius=10, color=(255, 0, 0), thickness=-10)
   original_pic = cv2.circle(original_pic, (bottom_left[0],bottom_left[1]), radius=10, color=(255, 0, 0), thickness=-10)
   original_pic = cv2.circle(original_pic, (bottom_right[0],bottom_right[1]), radius=10, color=(255, 0, 0), thickness=-10)
   
   
-  #Maximum length
+  #Find the maximum amongst leengths and breadths to find the maximum side for the warped image
   breadth_1 = euclidean_distance(bottom_left,bottom_right)
   breadth_2 = euclidean_distance(bottom_left,bottom_right)
   length_1 = euclidean_distance(top_right,bottom_right)
@@ -101,8 +136,8 @@ def crop_and_warp(original_img,img,box_array,show = True):
   destination_pts = np.array([[0,0],[max_side-1,0],[max_side-1,max_side-1],[0,max_side-1]],np.float32)
   # compute the perspective transform matrix and then apply it
   image_perspective = cv2.getPerspectiveTransform(box_array,destination_pts)
-  image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side),int(max_side)))
-  img_warped = cv2.warpPerspective(img,image_perspective,(int(max_side),int(max_side)))
+  image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side),int(max_side)))#warping the original image
+  img_warped = cv2.warpPerspective(img,image_perspective,(int(max_side),int(max_side))) #warping the grayscale image
   if show ==True:
     cv2_imshow(original_pic)
     cv2_imshow(image_warped)
