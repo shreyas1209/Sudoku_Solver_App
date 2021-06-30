@@ -8,7 +8,7 @@ This project is mainly written in Python and uses frameworks like PyTorch and Op
 
 ## Parts of the Project
 
-[1.Training the model to recogonize the digits](# Training the model to recogonize the digits)
+[1.Training the model to recogonize the digits](##-Training the model to recogonize the digits)
 
 ## Training the model to recogonize the digits
 Does this work lmao
