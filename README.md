@@ -7,7 +7,7 @@ The Sudoku Solver  is a project that makes use of Computer Vision to solve a sud
 This project is mainly written in Python and uses frameworks like PyTorch and OpenCV for training of the model and image preprocessing.
 
 ## Parts of the Project
-	[Markdown - Link](#Link)
+[Markdown - Link](#Link)
 
 
 # Link
