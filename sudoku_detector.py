@@ -53,10 +53,10 @@ def sudoku_detector(img,show = True, dilate = False ,erode = False):
   original_pic = img.copy()
   #displaying the preprocces_images
   if show == True:
-        cv2_imshow(image_gray)
-        cv2_imshow(image_blur)
-        cv2_imshow(image_threshold)
-        cv2_imshow(image_processed)
+        cv2_imshow(cv2.resize(image_gray,(360,360)))
+        cv2_imshow(cv2.resize(image_blur,(360,360)))
+        cv2_imshow(cv2.resize(image_threshold,(360,360)))
+        cv2_imshow(cv2.resize(image_processed,(360,360)))
           
   return(image_processed)
 #end of sudokupreprocessing
@@ -95,7 +95,7 @@ def find_boundary(original_img,img,show = True):
         bottom_left , _ = min(enumerate([bl[0][0] - bl[0][1] for bl in approx_box]), key= operator.itemgetter(1))
         bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in approx_box]), key= operator.itemgetter(1))
         if show ==True:
-          cv2_imshow(original_pic)
+          cv2_imshow(cv2.resize(original_pic,(360,360)))
         #returns coordinates
         return(np.array([approx_box[top_left][0],approx_box[top_right][0],approx_box[bottom_right][0],approx_box[bottom_left][0]],np.float32))
         
@@ -139,45 +139,53 @@ def crop_and_warp(original_img,img,box_array,show = True):
   image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side),int(max_side)))#warping the original image
   img_warped = cv2.warpPerspective(img,image_perspective,(int(max_side),int(max_side))) #warping the grayscale image
   if show ==True:
-    cv2_imshow(original_pic)
-    cv2_imshow(image_warped)
-    cv2_imshow(img_warped)
+    cv2_imshow(cv2.resize(original_pic,(360,360)))
+    cv2_imshow(cv2.resize(image_warped,(360,360)))
+    cv2_imshow(cv2.resize(img_warped,(360,360)))
   return (image_warped,img_warped)
 
 
 
 
 from skimage.segmentation import clear_border
-def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = True,tolerance = 0):
-  image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-
-  #image_blur = cv2.GaussianBlur(image_gray,(3,3),3)
-  #kernel = np.array([[0., 1., 0.], [1., 1., 1.], [0., 1., 0.]],np.uint8)
-  #image_processed = cv2.dilate(img, kernel)
+'''
+digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = True):Function that
+extracts each digit from the 9x9 grid
+Parameters:
+img: The preprocessed image that only contains the sudoku
+position: Tuple containing index of a particular square in the grid
+grid_size:Size of the entire sudoku grid
+extracted_img_size : Tuple for the size of the extracted image digit
+show: Default is True. Shows the extracted digit
+returns (extracted image)
+'''
+def digit_extraction(img,position,img_size,grid_size,extracted_img_size,show = True):
+  image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #Converting to grayscale
   image_processed = image_gray
-  block_size_h = img_size[0]//grid_size[0]
-  block_size_w = img_size[1]//grid_size[1]
-  h_i = block_size_h*(position[0])
-  h_f = h_i + block_size_h
-  w_i = block_size_w*(position[1])
-  w_f = w_i + block_size_w
-  digit = image_processed[h_i+tolerance:h_f-tolerance,w_i+tolerance:w_f-tolerance]
-  digit = cv2.threshold(digit,0,255, cv2.THRESH_BINARY_INV |  cv2.THRESH_OTSU)[1]
-  digit = clear_border(digit)
+  block_size_h = img_size[0]//grid_size[0] #height of each number block
+  block_size_w = img_size[1]//grid_size[1] #width of each number block
+  h_i = block_size_h*(position[0]) #top height of the digit box
+  h_f = h_i + block_size_h #bottom height of the digit box
+  w_i = block_size_w*(position[1]) #left coordinate of the digit box
+  w_f = w_i + block_size_w #right coordinate of the digit box
+  digit = image_processed[h_i:h_f,w_i:w_f] #cropping out the digit box
+  #Otsu's method avoids having to choose a threshold value and determines it automatically by
+  # determining an optimal global threshold value from the image histogram
+  digit = cv2.threshold(digit,0,255, cv2.THRESH_BINARY_INV |  cv2.THRESH_OTSU)[1] #applying OTSU threshold with binary inversion
+  digit = clear_border(digit) #clears objects connected to the image border
 
-  digit_contours = cv2.findContours(digit.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-  digit_contours = imutils.grab_contours(digit_contours)
-
-  if len(digit_contours)!=0:
-    digit_contour = max(digit_contours, key=cv2.contourArea)
-    background = np.zeros(digit.shape,dtype = np.uint8)
-    cv2.drawContours(background,[digit_contour],-1,255,-1)
-    digit = cv2.bitwise_and(digit,digit, mask=background)
+  digit_contours = cv2.findContours(digit.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)#finding the contours
+  digit_contours = imutils.grab_contours(digit_contours) #adds a counter to the contour
+  #image masking
+  if len(digit_contours)!=0: #checking if there are any contours in the image 
+    digit_contour = max(digit_contours, key=cv2.contourArea) #Finding the contour housing the largest area
+    background = np.zeros(digit.shape,dtype = np.uint8) #Creating a  mask of the size of digit
+    cv2.drawContours(background,[digit_contour],-1,255,-1) #drawing the digit contour on the mask
+    digit = cv2.bitwise_and(digit,digit, mask=background) #bitwiseAND is true if and only if both pixels are greater than zero
     
 
 
-  digit = cv2.resize(digit,extracted_img_size)
+  digit = cv2.resize(digit,extracted_img_size) #resizing the digit to desired output shape
       
       
   if show == True:
