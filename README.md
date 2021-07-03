@@ -163,13 +163,13 @@ img = cv2.putText(img, str(solved_sudoku_array[j][i])  ,(int(10+div*i),int((div-
 The code for this part van be found in the function **print_solved_sudoku(solved_sudoku_array,img,img_size = 360, boxes = 9)** in the file **Sudoku_Main.ipynb**.
 
 ## Limitations
-1.The Sudoku Solver cannot detect small sudoku images that are blur or are partially cut.
+1.The Sudoku Solver cannot detect small sudoku images that are blur or are partially cut.\
 2.The sudoku solver cannot detect more than 1 sudoku in a frame in most cases.
 
 ## Further Improvisation
 
 
-1.Deploying the sudoku solver in a mobile  app so that users can directly click an image of the sudoku and find the solution
+1.Deploying the sudoku solver in a mobile  app so that users can directly click an image of the sudoku and find the solution.\
 2.Enhancing the Sudoku solver for   detecting multiple sudoku images at once
 
 ## References
