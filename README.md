@@ -139,7 +139,41 @@ if len(digit_contours)!=0:
  **digit_extraction(img,position,img_size,grid_size,extracted_img_size,show  =  True)** which can be found in the file   **sudoku_detector.py**.
 
 ## Training the Model for Digit Recognition
+The model for digit recognition was trained using  the Printed Numbers Dataset which was appended to the MNIST dataset.
+The Printed Numbers Dataset can be found [here](https://www.kaggle.com/kshitijdhama/printed-digits-dataset).
+I used three different CNN models , that differ in the number of layers, dropout and number of channels in each layer.
+The code and the architecture can be found in the file **sudoku_net.py** in the **Models folder**
+
 
 ## Solving the Sudoku
+The sudoku puzzle is solved by passing a 9x9 numpy array into the function **solve_sudoku(grid)** which can be found in the file **sudoku_solver.py**. The function makes use of a backtracking algorithm to solve the sudoku puzzle.
+The algorithm works as follows:
+1.Find an empty box in the sudoku grid by using the function **find_empty(grid)**.If the Sudoku is filled return False otherwise return  True along with the value of its indices.
+hen some cell is filled with a digit, it checks whether it is valid or not. 
+
+2.Now assing that empty box with the number 1.If it is not valid, it checks for other numbers using the function **valid_place(grid,empty_row,empty_col,n)**. The function returns True id the number is valid and False otherwise. 
+
+3.If all numbers are checked from 1-9, and no valid digit found to place, it backtracks to the previous option.
 
 ## Displaying the Solution
+The solution is displayed by using an empty sudoku grid and the solved Sudoku values are placed in the grid by using the code:
+```
+img = cv2.putText(img, str(solved_sudoku_array[j][i])  ,(int(10+div*i),int((div-10)+div*j)), font,  1,(0,0,0),2,cv2.LINE_AA)
+```
+The code for this part van be found in the function **print_solved_sudoku(solved_sudoku_array,img,img_size = 360, boxes = 9)** in the file **Sudoku_Main.ipynb**.
+
+## Limitations
+1.The Sudoku Solver cannot detect small sudoku images that are blur or are partially cut.
+2.The sudoku solver cannot detect more than 1 sudoku in a frame in most cases.
+
+## Further Improvisation
+
+
+1.Deploying the sudoku solver in a mobile  app so that users can directly click an image of the sudoku and find the solution
+2.Enhancing the Sudoku solver for   detecting multiple sudoku images at once
+
+## References
+1. As this was my first time using OpenCV, I largely made use of the documentation on the [OpenCV website](https://opencv.org/). 
+2. Took some assistance from https://www.pyimagesearch.com/2020/08/10/opencv-sudoku-solver-and-ocr/
+3.  For the sudoku solver I referred to https://www.geeksforgeeks.org/sudoku-backtracking-7/
+
