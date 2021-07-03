@@ -15,9 +15,10 @@ This project is mainly written in Python and uses frameworks like PyTorch and Op
 
 
 ## Image Preprocessing for the Input Sudoku
-The image preprocessing is done by using OpenCV. Images of the sudoku taken need to be heavily preprocessed before each digit can be classified by the classification model. \
-Let us take an example of a sample sudoku :
-<  image>
+The image preprocessing is done by using OpenCV. Images of the sudoku taken need to be heavily preprocessed before each digit can be classified by the classification model.\
+Let us take an example of a sample sudoku :\
+![image](https://user-images.githubusercontent.com/55966833/124344825-6c459480-dbf2-11eb-8e23-06e809a3bda3.png)
+
 The procedure I followed for preprocessing is:
  ### 1. Converting the Colorspace from BGR to Grayscale
  The OpenCV command used for this was :
