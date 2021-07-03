@@ -29,7 +29,7 @@ The procedure I followed for preprocessing is:
  
   ```
   The imageof the sample sudoku after this step:\
-  ![image](https://user-images.githubusercontent.com/55966833/124344955-55537200-dbf3-11eb-8951-472b8261e52e.png)
+ ![image](https://user-images.githubusercontent.com/55966833/124345151-b7f93d80-dbf4-11eb-91be-0921aaed136b.png)
 
  ### 2. Gaussian blur
 Apply a Gaussian blur to the input Sudoku image with a kernel size 7 and standard deviation of  3 to reduce noise in the image
