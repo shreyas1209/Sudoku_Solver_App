@@ -168,8 +168,8 @@ The code and the architecture can be found in the file **sudoku_net.py** in the 
 
 
 ## Solving the Sudoku
-The sudoku puzzle is solved by passing a 9x9 numpy array into the function **solve_sudoku(grid)** which can be found in the file **sudoku_solver.py**. The function makes use of a backtracking algorithm to solve the sudoku puzzle.
-The algorithm works as follows:
+The sudoku puzzle is solved by passing a 9x9 numpy array into the function **solve_sudoku(grid)** which can be found in the file **sudoku_solver.py**. The function makes use of a backtracking algorithm to solve the sudoku puzzle.\
+The algorithm works as follows:\
 1.Find an empty box in the sudoku grid by using the function **find_empty(grid)**.If the Sudoku is filled return False otherwise return  True along with the value of its indices.
 hen some cell is filled with a digit, it checks whether it is valid or not. 
 
