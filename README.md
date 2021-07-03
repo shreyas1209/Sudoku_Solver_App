@@ -17,14 +17,20 @@ This project is mainly written in Python and uses frameworks like PyTorch and Op
 ## Image Preprocessing for the Input Sudoku
 The image preprocessing is done by using OpenCV. Images of the sudoku taken need to be heavily preprocessed before each digit can be classified by the classification model.\
 Let us take an example of a sample sudoku :\
-![image](https://user-images.githubusercontent.com/55966833/124344825-6c459480-dbf2-11eb-8e23-06e809a3bda3.png)
+![image](https://user-images.githubusercontent.com/55966833/124344942-3d7bee00-dbf3-11eb-8793-a8486afce551.png)
+
+
 
 The procedure I followed for preprocessing is:
  ### 1. Converting the Colorspace from BGR to Grayscale
  The OpenCV command used for this was :
  ```
  image_gray  =  cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+ 
   ```
+  The imageof the sample sudoku after this step:\
+  ![image](https://user-images.githubusercontent.com/55966833/124344955-55537200-dbf3-11eb-8951-472b8261e52e.png)
+
  ### 2. Gaussian blur
 Apply a Gaussian blur to the input Sudoku image with a kernel size 7 and standard deviation of  3 to reduce noise in the image
  The OpenCV command used for this was :
@@ -32,7 +38,9 @@ Apply a Gaussian blur to the input Sudoku image with a kernel size 7 and standar
  image_blur  =  cv2.GaussianBlur(image_gray,(7,7),3)
   ```
   The imageof the sample sudoku after this step:\
-  < insertimage >
+  ![image](https://user-images.githubusercontent.com/55966833/124344965-69976f00-dbf3-11eb-870b-d059f009e006.png)
+
+  
   ### 3. Adaptive Thresholding
 Thresholding is an operation that works such that if the pixel value is smaller than the threshold, it is set to 0, otherwise it is set to a maximum value.
  Adaptive threshold method where the threshold value is calculated for smaller regions. Max pixel value to be given after thresholding is 255 ( white color)
@@ -40,13 +48,16 @@ Thresholding is an operation that works such that if the pixel value is smaller 
 * cv2.THRESH_BINARY_INV - Inverts the case of binary thresholding
 
  The OpenCV command used for this was :
+ ![image](https://user-images.githubusercontent.com/55966833/124344981-816ef300-dbf3-11eb-93af-8385f4371d90.png)
+
  ```
  image_threshold  =  cv2.adaptiveThreshold(image_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
   ```
   The complete code for these three sections can be found in the 
   **sudoku_detector(img,show  =  True, dilate  =  False ,erode  =  False):** function in  the file   **sudoku_detector.py**.\
-  The image of the sample sudoku after this step:
-  < insertimage >
+  The image of the sample sudoku after this step:\
+ 
+
  ### 4. Finding the Boundary of The Sudoku Grid
  To find the boundary of the sudoku grid in the image , first step was to  find  the contours in the image by using the OpenCV command:
  ```
@@ -77,8 +88,10 @@ if (H>3 and W>3):
 	bottom_right , _ = max(enumerate([br[0][0] + br[0][1] for br in approx_box]), key= operator.itemgetter(1))
   ```
  The complete code for this is in the function **find_boundary(original_img,img,show  =  True):** which can be found in the file   **sudoku_detector.py**.
- The image of the sample sudoku after this step:
-  < insertimage >
+ The image of the sample sudoku after this step:\
+ ![image](https://user-images.githubusercontent.com/55966833/124344997-9d729480-dbf3-11eb-999f-5d0d5c881694.png)
+
+  
  ### 5.Cropping and Warping
 Next I wrote a function that crops the sudoku's bounding box from the rest of the image and gives us a top-down view.For this I made use of two OpenCV commands:
 ```
@@ -88,7 +101,10 @@ image_warped = cv2.warpPerspective(original_img,image_perspective,(int(max_side)
 ```
 The detailed code for this can be found in the function **crop_and_warp(original_img,img,box_array,show  =  True):** in the file **sudoku_detector.py**.
 The image of the sample sudoku after this step:
-  < insertimage >
+![image](https://user-images.githubusercontent.com/55966833/124345014-b2e7be80-dbf3-11eb-8b93-d04a4ecbe48a.png)
+![image](https://user-images.githubusercontent.com/55966833/124345022-be3aea00-dbf3-11eb-8dc1-4dac0c428c07.png)
+
+  
   ### 6. Extracting Digits  From the Sudoku Grid
  In order to perform this step, I reshaped the input image to 360x360 before extracting the digit followed by which I changed its colorspace from BGR to Grayscale using:
    ```
@@ -138,6 +154,11 @@ if len(digit_contours)!=0:
  
  The entire code to this section can be found in the 
  **digit_extraction(img,position,img_size,grid_size,extracted_img_size,show  =  True)** which can be found in the file   **sudoku_detector.py**.
+ 
+ Images of some of the digits are:\
+ ![image](https://user-images.githubusercontent.com/55966833/124345115-6650b300-dbf4-11eb-8f1e-6472b83441a9.png)
+
+ 
 
 ## Training the Model for Digit Recognition
 The model for digit recognition was trained using  the Printed Numbers Dataset which was appended to the MNIST dataset.
