@@ -48,14 +48,14 @@ Thresholding is an operation that works such that if the pixel value is smaller 
 * cv2.THRESH_BINARY_INV - Inverts the case of binary thresholding
 
  The OpenCV command used for this was :
- ![image](https://user-images.githubusercontent.com/55966833/124344981-816ef300-dbf3-11eb-93af-8385f4371d90.png)
-
+ 
  ```
  image_threshold  =  cv2.adaptiveThreshold(image_blur, 255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
   ```
   The complete code for these three sections can be found in the 
   **sudoku_detector(img,show  =  True, dilate  =  False ,erode  =  False):** function in  the file   **sudoku_detector.py**.\
   The image of the sample sudoku after this step:\
+  ![image](https://user-images.githubusercontent.com/55966833/124344981-816ef300-dbf3-11eb-93af-8385f4371d90.png)
  
 
  ### 4. Finding the Boundary of The Sudoku Grid
