@@ -14,10 +14,10 @@ import time
 class sudokunet1(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
     super(sudokunet1,self).__init__()
-    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
-    self.pool1 = nn.MaxPool2d(2)#12x12
-    self.conv2 = nn.Conv2d(32,32,kernel_size = 3, stride = 1,padding = 1) #10x10
-    self.pool2 = nn.MaxPool2d(2) #5x5
+    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #26x26
+    self.pool1 = nn.MaxPool2d(2) #13x13
+    self.conv2 = nn.Conv2d(32,32,kernel_size = 3, stride = 1,padding = 1) #13x13
+    self.pool2 = nn.MaxPool2d(2) #6x6
     self.fc1 = nn.Linear(1152,128)
     self.dropout1 = nn.Dropout(p=0.2)
     self.fc2 = nn.Linear(128,64)
@@ -47,14 +47,14 @@ class sudokunet1(nn.Module):
 class sudokunet2(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
     super(sudokunet2,self).__init__()
-    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
-    self.pool1 = nn.MaxPool2d(2)#12x12
-    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #10x10
-    self.pool2 = nn.MaxPool2d(2) #5x5
+    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #26x26
+    self.pool1 = nn.MaxPool2d(2)#13x13
+    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #13x13
+    self.pool2 = nn.MaxPool2d(2) #6x6
     self.fc1 = nn.Linear(2304,128)
     self.dropout1 = nn.Dropout(p=0.2)
     self.fc2 = nn.Linear(128,64)
-    self.dropout2 = nn.Dropout(p=0.4) #0.5
+    self.dropout2 = nn.Dropout(p=0.4)
     self.output = nn.Linear(64, output_classes)
 
   def forward(self,x):
@@ -81,9 +81,9 @@ class sudokunet2(nn.Module):
 class sudokunet3(nn.Module):
   def __init__(self,output_classes,in_channels = 1):
     super(sudokunet3,self).__init__()
-    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #24x24
-    self.pool1 = nn.MaxPool2d(2)#12x12
-    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #12x12
+    self.conv1 = nn.Conv2d(1,32,kernel_size = 5,stride = 1,padding = 1) #26x26
+    self.pool1 = nn.MaxPool2d(2)#13x13
+    self.conv2 = nn.Conv2d(32,64,kernel_size = 3, stride = 1,padding = 1) #13x13
     self.pool2 = nn.MaxPool2d(2) #6x6
     self.fc1 = nn.Linear(2304,256)
     self.dropout1 = nn.Dropout(p=0.25)
