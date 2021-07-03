@@ -183,7 +183,7 @@ The solution is displayed by using an empty sudoku grid and the solved Sudoku va
 img = cv2.putText(img, str(solved_sudoku_array[j][i])  ,(int(10+div*i),int((div-10)+div*j)), font,  1,(0,0,0),2,cv2.LINE_AA)
 ```
 The code for this part van be found in the function **print_solved_sudoku(solved_sudoku_array,img,img_size = 360, boxes = 9)** in the file **Sudoku_Main.ipynb**.
-The final solved Sudoku is displayed as:
+The final solved Sudoku is displayed as:\
 ![image](https://user-images.githubusercontent.com/55966833/124345199-2a6a1d80-dbf5-11eb-8bc5-d9906cb0214c.png)
 
 
